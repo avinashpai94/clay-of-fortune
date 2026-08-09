@@ -18,8 +18,9 @@ let currentRotation = 0; // accumulated wheel rotation in radians
 let isSpinning = false;
 let winnerIndex = -1; // index of the highlighted winning slice, or -1
 
-let rawOptions = []; // full option list from options.json
+let rawOptions = []; // full option list (from options.json or the editor)
 let sizeByWeight = false;
+let currentTitle = "Clay of Fortune";
 
 // Per-browser state (localStorage). Removed winners and history never leave
 // this browser, so one machine's removals don't affect anyone else's wheel.
@@ -27,6 +28,7 @@ const LS = {
   removed: "cof-removed",
   history: "cof-history",
   removeAfter: "cof-remove-after",
+  custom: "cof-custom-options", // options edited in-page (this browser only)
 };
 
 function loadJSON(key, fallback) {
@@ -158,32 +160,56 @@ function updateSpinAvailability() {
   }
 }
 
+/** Apply a full options payload (from file or the in-page editor) to the wheel. */
+function applyData(data) {
+  currentTitle = data.title || "Clay of Fortune";
+  titleEl.textContent = currentTitle;
+  document.title = currentTitle;
+  rawOptions = Array.isArray(data.options) ? data.options : [];
+  sizeByWeight = data.sizeByWeight === true;
+  winnerIndex = -1;
+  rebuild();
+  if (activeOptions().length >= 2) {
+    statusEl.textContent = `${activeOptions().length} options ready. Spin!`;
+  }
+}
+
+async function loadFromFile() {
+  const res = await fetch("options.json", { cache: "no-store" });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
 async function init() {
   setupCanvas();
   renderHistory();
   try {
-    const res = await fetch("options.json", { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-
-    if (data.title) {
-      titleEl.textContent = data.title;
-      document.title = data.title;
+    const custom = loadJSON(LS.custom, null);
+    const usingCustom = custom && Array.isArray(custom.options) && custom.options.length >= 2;
+    const data = usingCustom ? custom : await loadFromFile();
+    if (!Array.isArray(data.options) || data.options.length < 2) {
+      throw new Error("Need at least 2 options");
     }
-
-    rawOptions = Array.isArray(data.options) ? data.options : [];
-    sizeByWeight = data.sizeByWeight === true;
-    if (rawOptions.length < 2) throw new Error("Need at least 2 options in options.json");
-
-    rebuild();
-    if (activeOptions().length >= 2) {
-      statusEl.textContent = `${activeOptions().length} options ready. Spin!`;
+    applyData(data);
+    if (usingCustom && activeOptions().length >= 2) {
+      statusEl.textContent += " · using saved edits";
     }
   } catch (err) {
     statusEl.textContent = `Couldn't load options: ${err.message}`;
     console.error(err);
   }
 }
+
+// Small API the in-page editor uses to read/apply/reset options.
+window.WheelApp = {
+  applyData,
+  currentData: () => ({ title: currentTitle, sizeByWeight, options: rawOptions }),
+  async reloadFromFile() {
+    const data = await loadFromFile();
+    applyData(data);
+    return data;
+  },
+};
 
 const TAU = Math.PI * 2;
 const SPIN_DURATION = 4200; // ms

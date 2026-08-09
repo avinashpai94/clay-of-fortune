@@ -27,7 +27,23 @@
 
     <div class="controls">
       <button id="reset" class="btn" type="button">↺ Reset wheel</button>
+      <button id="toggle-editor" class="btn" type="button" aria-expanded="false" aria-controls="editor-panel">✏️ Edit options</button>
     </div>
+
+    <section id="editor-panel" class="editor" hidden>
+      <label for="editor-text" class="editor-label">Options JSON</label>
+      <textarea id="editor-text" class="editor-text" spellcheck="false" autocapitalize="off" autocomplete="off" rows="14" aria-describedby="editor-status"></textarea>
+      <p id="editor-status" class="editor-status" role="status" aria-live="polite"></p>
+      <div class="editor-actions">
+        <button id="editor-apply" class="btn" type="button">Apply</button>
+        <button id="editor-copy" class="btn" type="button">Copy JSON</button>
+        <button id="editor-revert" class="btn" type="button">Revert to file</button>
+      </div>
+      <p class="editor-hint">
+        Applied changes are saved in <strong>this browser only</strong>. To update
+        the wheel for everyone, copy this JSON into <code>options.json</code> and commit.
+      </p>
+    </section>
 
     <section id="history" class="history" hidden>
       <div class="history-head">
@@ -41,5 +57,6 @@
   <script src="sound.js"></script>
   <script src="confetti.js"></script>
   <script src="wheel.js"></script>
+  <script src="editor.js"></script>
 </body>
 </html>

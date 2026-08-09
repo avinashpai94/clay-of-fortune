@@ -199,3 +199,71 @@ h1 {
 
 .hist-label { color: var(--text); }
 .hist-time { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+
+/* In-page options editor */
+.editor {
+  max-width: 480px;
+  margin: 1.5rem auto 0;
+  text-align: left;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.editor-label {
+  display: block;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+
+.editor-text {
+  width: 100%;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text);
+  background: #0b0c1a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 0.6rem 0.7rem;
+  tab-size: 2;
+}
+.editor-text:focus {
+  outline: none;
+  border-color: var(--pointer);
+}
+
+.editor-status {
+  min-height: 1.3em;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  font-family: ui-monospace, Menlo, monospace;
+}
+.editor-status.ok { color: #8ce99a; }
+.editor-status.err { color: #ff8787; }
+
+.editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.editor-actions .btn { font-size: 0.9rem; padding: 0.4rem 0.9rem; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+
+.editor-hint {
+  margin: 0.9rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.editor-hint code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.05em 0.35em;
+  border-radius: 4px;
+}
