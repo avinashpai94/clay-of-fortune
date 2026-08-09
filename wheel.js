@@ -38,7 +38,7 @@ function loadJSON(key, fallback) {
 
 let removed = new Set(loadJSON(LS.removed, [])); // labels removed from the wheel
 let history = loadJSON(LS.history, []); // [{ label, at }] most recent last
-let removeAfterSpin = localStorage.getItem(LS.removeAfter) === "on";
+let removeAfterSpin = localStorage.getItem(LS.removeAfter) !== "off"; // on by default
 
 const saveRemoved = () => localStorage.setItem(LS.removed, JSON.stringify([...removed]));
 const saveHistory = () => localStorage.setItem(LS.history, JSON.stringify(history));
@@ -396,6 +396,36 @@ function setupControls() {
 
   document.getElementById("reset").addEventListener("click", resetWheel);
   document.getElementById("clear-history").addEventListener("click", clearHistory);
+
+  setupMenu();
+}
+
+/** Slide-out options menu on the right. */
+function setupMenu() {
+  const menu = document.getElementById("menu");
+  const scrim = document.getElementById("menu-scrim");
+  const openBtn = document.getElementById("menu-toggle");
+  const closeBtn = document.getElementById("menu-close");
+
+  const open = () => {
+    menu.classList.add("open");
+    scrim.hidden = false;
+    requestAnimationFrame(() => scrim.classList.add("open"));
+    openBtn.setAttribute("aria-expanded", "true");
+  };
+  const close = () => {
+    menu.classList.remove("open");
+    scrim.classList.remove("open");
+    openBtn.setAttribute("aria-expanded", "false");
+    setTimeout(() => { scrim.hidden = true; }, 250);
+  };
+
+  openBtn.addEventListener("click", () => (menu.classList.contains("open") ? close() : open()));
+  closeBtn.addEventListener("click", close);
+  scrim.addEventListener("click", close);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && menu.classList.contains("open")) close();
+  });
 }
 
 spinBtn.addEventListener("click", spin);
