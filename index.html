@@ -19,9 +19,16 @@
       <canvas id="wheel" width="500" height="500" role="img" aria-label="Prize wheel"></canvas>
       <button id="spin" class="spin-btn" type="button">SPIN</button>
     </div>
-
-    <p id="status" class="status" role="status" aria-live="polite">Loading options…</p>
   </main>
+
+  <div id="winner-overlay" class="winner-overlay" hidden>
+    <div class="winner-card" role="dialog" aria-modal="true" aria-labelledby="winner-text">
+      <button id="winner-close" class="winner-close" type="button" aria-label="Close">✕</button>
+      <p class="winner-eyebrow">Winner</p>
+      <p id="winner-text" class="winner-text"></p>
+      <img id="winner-image" class="winner-image" alt="" hidden />
+    </div>
+  </div>
 
   <div id="menu-scrim" class="menu-scrim" hidden></div>
 

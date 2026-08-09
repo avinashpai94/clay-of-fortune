@@ -64,6 +64,9 @@
       if (o.color !== undefined && typeof o.color !== "string") {
         return `Option ${n} ("${o.label}") "color" must be a string`;
       }
+      if (o.image !== undefined && (typeof o.image !== "string" || !o.image.trim())) {
+        return `Option ${n} ("${o.label}") "image" must be a non-empty string (URL or path)`;
+      }
     }
     return null;
   }

@@ -9,9 +9,16 @@ const PALETTE = [
 
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
-const statusEl = document.getElementById("status");
 const spinBtn = document.getElementById("spin");
 const titleEl = document.getElementById("title");
+const winnerOverlay = document.getElementById("winner-overlay");
+const winnerText = document.getElementById("winner-text");
+const winnerImage = document.getElementById("winner-image");
+// If an image link is broken, fall back to text-only gracefully.
+winnerImage.addEventListener("error", () => {
+  winnerImage.hidden = true;
+  winnerOverlay.classList.remove("has-image");
+});
 
 let slices = []; // { label, weight, color, start, end } angles in radians
 let currentRotation = 0; // accumulated wheel rotation in radians
@@ -70,6 +77,7 @@ function buildSlices(options, sizeByWeight = false) {
       label: o.label,
       weight, // landing probability weight (independent of visual sweep)
       color: o.color || PALETTE[i % PALETTE.length],
+      image: o.image || null, // optional; shown only on the winner overlay
       start: angle,
       end: angle + sweep,
     };
@@ -148,16 +156,15 @@ function rebuild() {
   updateSpinAvailability();
 }
 
-/** Enable/disable spinning based on how many options remain. */
+/**
+ * Update the center button's state. When the wheel still has >= 2 options it
+ * acts as SPIN; when it's been emptied by "remove winner" it becomes RESET so
+ * the user is never stuck with a dead button (Reset also lives in the menu).
+ */
 function updateSpinAvailability() {
-  const active = activeOptions();
-  const canSpin = !isSpinning && active.length >= 2;
-  spinBtn.disabled = !canSpin;
-  if (active.length < 2) {
-    statusEl.textContent = active.length === 1
-      ? `Last one standing: ${active[0].label}. Reset to spin again.`
-      : "No options left — reset to spin again.";
-  }
+  const exhausted = activeOptions().length < 2;
+  spinBtn.textContent = exhausted ? "RESET" : "SPIN";
+  spinBtn.disabled = isSpinning; // only truly disabled mid-spin
 }
 
 /** Apply a full options payload (from file or the in-page editor) to the wheel. */
@@ -169,9 +176,6 @@ function applyData(data) {
   sizeByWeight = data.sizeByWeight === true;
   winnerIndex = -1;
   rebuild();
-  if (activeOptions().length >= 2) {
-    statusEl.textContent = `${activeOptions().length} options ready. Spin!`;
-  }
 }
 
 async function loadFromFile() {
@@ -191,12 +195,8 @@ async function init() {
       throw new Error("Need at least 2 options");
     }
     applyData(data);
-    if (usingCustom && activeOptions().length >= 2) {
-      statusEl.textContent += " · using saved edits";
-    }
   } catch (err) {
-    statusEl.textContent = `Couldn't load options: ${err.message}`;
-    console.error(err);
+    console.error("Couldn't load options:", err);
   }
 }
 
@@ -266,7 +266,6 @@ function spin() {
   isSpinning = true;
   winnerIndex = -1;
   spinBtn.disabled = true;
-  statusEl.textContent = "Spinning…";
   Sound.resume();
 
   const index = pickWeightedIndex();
@@ -300,11 +299,11 @@ function onSpinEnd(index) {
   winnerIndex = index;
   const label = slices[index].label;
   drawWheel(currentRotation, winnerIndex);
-  statusEl.textContent = `Winner: ${label}!`;
   Sound.fanfare();
   const { x, y } = wheelCenter();
   Confetti.burst(x, y);
   addHistory(label);
+  showWinner(label, slices[index].image);
 
   if (removeAfterSpin) {
     // Let the highlight + confetti land before the slice disappears.
@@ -312,6 +311,31 @@ function onSpinEnd(index) {
   } else {
     updateSpinAvailability();
   }
+}
+
+/**
+ * Show the winner overlay (dismiss with the ✕, the backdrop, or Esc).
+ * With an image, the label becomes a heading above the image; without one,
+ * it's just the label text.
+ */
+function showWinner(label, image) {
+  winnerText.textContent = label;
+  if (image) {
+    winnerImage.src = image;
+    winnerImage.alt = label;
+    winnerImage.hidden = false;
+  } else {
+    winnerImage.hidden = true;
+    winnerImage.removeAttribute("src");
+  }
+  winnerOverlay.classList.toggle("has-image", !!image);
+  winnerOverlay.hidden = false;
+  requestAnimationFrame(() => winnerOverlay.classList.add("show"));
+}
+
+function hideWinner() {
+  winnerOverlay.classList.remove("show");
+  setTimeout(() => { winnerOverlay.hidden = true; }, 200);
 }
 
 /** Remove an option from this browser's wheel and persist the change. */
@@ -328,9 +352,6 @@ function resetWheel() {
   saveRemoved();
   winnerIndex = -1;
   rebuild();
-  if (activeOptions().length >= 2) {
-    statusEl.textContent = `${activeOptions().length} options ready. Spin!`;
-  }
 }
 
 function addHistory(label) {
@@ -397,6 +418,14 @@ function setupControls() {
   document.getElementById("reset").addEventListener("click", resetWheel);
   document.getElementById("clear-history").addEventListener("click", clearHistory);
 
+  document.getElementById("winner-close").addEventListener("click", hideWinner);
+  winnerOverlay.addEventListener("click", (e) => {
+    if (e.target === winnerOverlay) hideWinner(); // click on backdrop, not the card
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !winnerOverlay.hidden) hideWinner();
+  });
+
   setupMenu();
 }
 
@@ -428,7 +457,11 @@ function setupMenu() {
   });
 }
 
-spinBtn.addEventListener("click", spin);
+// The center button spins normally, but doubles as RESET once the wheel is empty.
+spinBtn.addEventListener("click", () => {
+  if (activeOptions().length < 2) resetWheel();
+  else spin();
+});
 setupControls();
 
 init();

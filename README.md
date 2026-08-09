@@ -26,6 +26,7 @@ Each option supports:
 | `label`  | yes      | Text shown on the slice (emoji OK, e.g. `"🍕 Pizza"`)          |
 | `weight` | no       | Landing probability (default `1`); visual size only if `sizeByWeight` |
 | `color`  | no       | Slice color; auto-assigned from a palette if omitted           |
+| `image`  | no       | Image URL/path shown on the winner overlay (label becomes a heading above it). The wheel slice always stays text. Falls back to text if the image fails to load. |
 
 ```json
 {

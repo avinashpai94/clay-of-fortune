@@ -2,13 +2,19 @@
   "title": "Clay of Fortune",
   "sizeByWeight": false,
   "options": [
-    { "label": "🍕 Pizza",   "weight": 2, "color": "#e63946" },
-    { "label": "🌮 Tacos",   "weight": 1, "color": "#f4a261" },
-    { "label": "🍣 Sushi",   "weight": 1, "color": "#2a9d8f" },
-    { "label": "🍔 Burgers", "weight": 1, "color": "#457b9d" },
-    { "label": "🍜 Ramen",   "weight": 1, "color": "#e9c46a" },
-    { "label": "🥗 Salad",   "weight": 1, "color": "#8ab17d" },
-    { "label": "🍛 Curry",   "weight": 1, "color": "#bc6c25" },
-    { "label": "🍖 BBQ",     "weight": 1, "color": "#6d597a" }
+    { "label": "🍄 Mushroom", "weight": 1, "color": "#e63946" },
+    { "label": "🐧 Penguin",  "weight": 1, "color": "#457b9d" },
+    { "label": "🐌 Snail",    "weight": 1, "color": "#bc6c25" },
+    { "label": "🐢 Turtle",   "weight": 1, "color": "#2a9d8f" },
+    { "label": "🦆 Duck",     "weight": 1, "color": "#e9c46a" },
+    { "label": "🐷 Pig",      "weight": 1, "color": "#e88fa8" },
+    { "label": "👻 Ghost",    "weight": 1, "color": "#8d99ae" },
+    { "label": "🐙 Octopus",  "weight": 1, "color": "#6d597a" },
+    { "label": "🐸 Frog",     "weight": 1, "color": "#8ab17d" },
+    { "label": "🐳 Whale",    "weight": 1, "color": "#4361ee" },
+    { "label": "🥑 Avocado",  "weight": 1, "color": "#606c38" },
+    { "label": "🌵 Cactus",   "weight": 1, "color": "#52796f" },
+    { "label": "🍩 Donut",    "weight": 1, "color": "#d4a373" },
+    { "label": "🐘 Elephant", "weight": 1, "color": "#9a8c98" }
   ]
 }
