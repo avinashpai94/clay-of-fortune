@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clay of Fortune</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="confetti" class="confetti-layer" aria-hidden="true"></canvas>
+  <main class="app">
+    <h1 id="title">Clay of Fortune</h1>
+
+    <div class="wheel-stage">
+      <div class="pointer" aria-hidden="true"></div>
+      <canvas id="wheel" width="500" height="500" role="img" aria-label="Prize wheel"></canvas>
+      <button id="spin" class="spin-btn" type="button">SPIN</button>
+    </div>
+
+    <p id="status" class="status" role="status" aria-live="polite">Loading options…</p>
+
+    <div class="controls">
+      <button id="toggle-sound" class="toggle" type="button" aria-pressed="true">🔊 Sound</button>
+      <button id="toggle-confetti" class="toggle" type="button" aria-pressed="true">🎉 Confetti</button>
+      <button id="toggle-remove" class="toggle" type="button" aria-pressed="false">➖ Remove winner</button>
+    </div>
+
+    <div class="controls">
+      <button id="reset" class="btn" type="button">↺ Reset wheel</button>
+    </div>
+
+    <section id="history" class="history" hidden>
+      <div class="history-head">
+        <h2>Past winners</h2>
+        <button id="clear-history" class="link-btn" type="button">Clear</button>
+      </div>
+      <ol id="history-list"></ol>
+    </section>
+  </main>
+
+  <script src="sound.js"></script>
+  <script src="confetti.js"></script>
+  <script src="wheel.js"></script>
+</body>
+</html>

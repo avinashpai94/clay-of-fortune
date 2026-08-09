@@ -1,0 +1,14 @@
+{
+  "title": "Clay of Fortune",
+  "sizeByWeight": false,
+  "options": [
+    { "label": "🍕 Pizza",   "weight": 2, "color": "#e63946" },
+    { "label": "🌮 Tacos",   "weight": 1, "color": "#f4a261" },
+    { "label": "🍣 Sushi",   "weight": 1, "color": "#2a9d8f" },
+    { "label": "🍔 Burgers", "weight": 1, "color": "#457b9d" },
+    { "label": "🍜 Ramen",   "weight": 1, "color": "#e9c46a" },
+    { "label": "🥗 Salad",   "weight": 1, "color": "#8ab17d" },
+    { "label": "🍛 Curry",   "weight": 1, "color": "#bc6c25" },
+    { "label": "🍖 BBQ",     "weight": 1, "color": "#6d597a" }
+  ]
+}

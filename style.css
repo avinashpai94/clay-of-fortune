@@ -1,0 +1,201 @@
+:root {
+  --bg: #0f1020;
+  --bg-accent: #1a1b3a;
+  --text: #f5f5fa;
+  --muted: #a9abc9;
+  --pointer: #ffd23f;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at 50% 0%, var(--bg-accent), var(--bg) 70%);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.app {
+  width: 100%;
+  max-width: 640px;
+  padding: 2rem 1rem 4rem;
+  text-align: center;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+  letter-spacing: 0.02em;
+  margin: 0 0 1.5rem;
+}
+
+.wheel-stage {
+  position: relative;
+  width: min(90vw, 500px);
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+}
+
+#wheel {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 50%;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+/* Pointer sits at the top, pointing down into the wheel */
+.pointer {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 18px solid transparent;
+  border-right: 18px solid transparent;
+  border-top: 30px solid var(--pointer);
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.4));
+  z-index: 3;
+}
+
+/* Center hub / spin button */
+.spin-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 22%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.85);
+  background: #14152e;
+  color: var(--text);
+  font-weight: 700;
+  font-size: clamp(0.8rem, 2.5vw, 1rem);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  transition: transform 0.1s ease, background 0.2s ease;
+}
+
+.spin-btn:hover { background: #20224a; }
+.spin-btn:active { transform: translate(-50%, -50%) scale(0.95); }
+.spin-btn:disabled { cursor: default; opacity: 0.75; }
+
+.status {
+  margin-top: 1.75rem;
+  min-height: 1.5em;
+  font-size: 1.1rem;
+  color: var(--muted);
+}
+
+/* Full-screen confetti overlay — never intercepts clicks */
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.toggle {
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.toggle:hover { background: rgba(255, 255, 255, 0.16); }
+
+/* "Off" state: dimmed with a strike-through label */
+.toggle[aria-pressed="false"] {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.btn {
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn:hover { background: rgba(255, 255, 255, 0.16); }
+
+.history {
+  max-width: 360px;
+  margin: 2.5rem auto 0;
+  text-align: left;
+}
+
+.history-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 0.4rem;
+}
+
+.history-head h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
+.link-btn:hover { color: var(--text); }
+
+#history-list {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+#history-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.35rem 0.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.hist-label { color: var(--text); }
+.hist-time { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 0.9rem; }
