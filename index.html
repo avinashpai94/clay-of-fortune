@@ -15,7 +15,10 @@
     <h1 id="title">Clay of Fortune</h1>
 
     <div class="wheel-stage">
-      <div class="pointer" aria-hidden="true"></div>
+      <svg class="pointer" viewBox="0 0 30 64" aria-hidden="true">
+        <path class="flapper-blade" d="M15 2 C22 2 25 6 25 13 L20.5 52 C20 57 18.5 61 15 62 C11.5 61 10 57 9.5 52 L5 13 C5 6 8 2 15 2 Z"/>
+        <circle class="flapper-pin" cx="15" cy="12" r="3.4"/>
+      </svg>
       <canvas id="wheel" width="500" height="500" role="img" aria-label="Prize wheel"></canvas>
       <button id="spin" class="spin-btn" type="button">SPIN</button>
     </div>
@@ -66,11 +69,14 @@
         <div class="editor-actions">
           <button id="editor-apply" class="btn" type="button">Apply</button>
           <button id="editor-copy" class="btn" type="button">Copy JSON</button>
+          <button id="editor-link" class="btn" type="button">Copy link</button>
           <button id="editor-revert" class="btn" type="button">Revert to file</button>
         </div>
         <p class="editor-hint">
-          Applied changes are saved in <strong>this browser only</strong>. To update
-          the wheel for everyone, copy this JSON into <code>options.json</code> and commit.
+          <strong>Copy link</strong> makes a shareable URL with these options baked in —
+          send it and the wheel loads for anyone, no server needed. Applied changes are
+          otherwise saved in <strong>this browser only</strong>; to change the default
+          for everyone, paste this JSON into <code>options.json</code> and commit.
         </p>
       </section>
     </div>

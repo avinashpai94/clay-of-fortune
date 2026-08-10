@@ -32,7 +32,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 2.25rem;
 }
 
 h1 {
@@ -56,20 +56,25 @@ h1 {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
 }
 
-/* Pointer sits at the top, pointing down into the wheel */
+/* Flapper: a tapered blade pinned at the top that hangs down and flicks off pegs */
 .pointer {
   position: absolute;
-  top: -6px;
+  top: -26px;
   left: 50%;
   transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 18px solid transparent;
-  border-right: 18px solid transparent;
-  border-top: 30px solid var(--pointer);
+  transform-origin: 50% 12px; /* pivot at the rivet near the top */
+  width: 30px;
+  height: 64px;
+  display: block;
   filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.4));
   z-index: 3;
 }
+.flapper-blade {
+  fill: var(--pointer);
+  stroke: rgba(0, 0, 0, 0.4);
+  stroke-width: 1.5;
+}
+.flapper-pin { fill: #14152e; }
 
 /* Center hub / spin button */
 .spin-btn {

@@ -11,6 +11,7 @@
   const statusEl = document.getElementById("editor-status");
   const applyBtn = document.getElementById("editor-apply");
   const copyBtn = document.getElementById("editor-copy");
+  const linkBtn = document.getElementById("editor-link");
   const revertBtn = document.getElementById("editor-revert");
 
   const pretty = (data) => JSON.stringify(data, null, 2);
@@ -118,6 +119,30 @@
     setTimeout(() => { btn.textContent = original; }, 1200);
   }
 
+  /** Copy text with a fallback for non-secure contexts / older browsers. */
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch { /* fall through to execCommand */ }
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+
   toggleBtn.addEventListener("click", () => (panel.hidden ? open() : close()));
   textarea.addEventListener("input", validate);
 
@@ -130,13 +155,27 @@
   });
 
   copyBtn.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(textarea.value);
-    } catch {
-      textarea.select();
-      document.execCommand("copy");
+    const ok = await copyText(textarea.value);
+    flash(copyBtn, ok ? "Copied!" : "Copy failed");
+  });
+
+  linkBtn.addEventListener("click", async () => {
+    const data = validate();
+    if (!data) { setStatus(false, "⚠ Fix the JSON before making a link"); return; }
+    if (!window.WheelApp || typeof window.WheelApp.shareURL !== "function") {
+      setStatus(false, "⚠ Share not loaded — hard-refresh the page (Cmd+Shift+R)");
+      return;
     }
-    flash(copyBtn, "Copied!");
+    let url;
+    try {
+      url = window.WheelApp.shareURL(data);
+    } catch (err) {
+      setStatus(false, "⚠ Couldn't build link: " + err.message);
+      return;
+    }
+    const ok = await copyText(url);
+    if (ok) flash(linkBtn, "Link copied!");
+    else setStatus(true, "Copy this link manually: " + url);
   });
 
   revertBtn.addEventListener("click", async () => {

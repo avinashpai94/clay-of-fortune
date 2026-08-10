@@ -43,6 +43,15 @@ Each option supports:
 Sound (synthesized ticking + a win fanfare) and confetti can each be toggled
 with the buttons under the wheel. Both preferences are remembered per-browser.
 
+## Sharing a custom wheel (no server)
+
+Open the menu → **Edit options**, tweak the JSON, then **Copy link**. That produces
+a URL with the whole wheel encoded in the `#w=` hash fragment (URL-safe Base64).
+Send it to anyone — their browser decodes it locally and loads that wheel. Because
+it lives in the hash, nothing is sent to a server; it works entirely client-side.
+
+Load priority is: **URL link → this browser's saved edits → `options.json`**.
+
 ## Running locally
 
 Because the page fetches `options.json`, open it through a local server (not

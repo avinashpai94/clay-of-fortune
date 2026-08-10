@@ -11,6 +11,7 @@ const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 const spinBtn = document.getElementById("spin");
 const titleEl = document.getElementById("title");
+const flapper = document.querySelector(".pointer");
 const winnerOverlay = document.getElementById("winner-overlay");
 const winnerText = document.getElementById("winner-text");
 const winnerImage = document.getElementById("winner-image");
@@ -140,6 +141,19 @@ function drawWheel(rotation = 0, highlightIndex = -1) {
   ctx.strokeStyle = "rgba(255,255,255,0.9)";
   ctx.stroke();
 
+  // Pegs at every slice boundary (what the flapper ratchets against)
+  for (const slice of slices) {
+    const px = Math.cos(slice.start) * radius;
+    const py = Math.sin(slice.start) * radius;
+    ctx.beginPath();
+    ctx.arc(px, py, 6, 0, Math.PI * 2);
+    ctx.fillStyle = "#fdfdff";
+    ctx.fill();
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = "rgba(0,0,0,0.4)";
+    ctx.stroke();
+  }
+
   ctx.restore();
 }
 
@@ -184,16 +198,55 @@ async function loadFromFile() {
   return res.json();
 }
 
+/* ---- Share-via-URL: encode the options into the #w= hash fragment ---- */
+
+// UTF-8 + URL-safe Base64 (handles emoji correctly).
+function toB64Url(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = "";
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function fromB64Url(b64) {
+  const bin = atob(b64.replace(/-/g, "+").replace(/_/g, "/"));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+const encodeState = (data) => toB64Url(JSON.stringify(data));
+
+/** Read an encoded wheel from the URL hash, or null if absent/invalid. */
+function readURLState() {
+  const m = location.hash.match(/[#&]w=([^&]+)/);
+  if (!m) return null;
+  try {
+    return JSON.parse(fromB64Url(m[1]));
+  } catch (err) {
+    console.warn("Ignoring invalid wheel data in URL:", err);
+    return null;
+  }
+}
+
+/** Build a full shareable link that encodes the given options. */
+const shareURL = (data) =>
+  `${location.origin}${location.pathname}#w=${encodeState(data)}`;
+
 async function init() {
   setupCanvas();
   renderHistory();
   try {
+    // Priority: a shared URL link > this browser's saved edits > options.json
+    const urlData = readURLState();
     const custom = loadJSON(LS.custom, null);
-    const usingCustom = custom && Array.isArray(custom.options) && custom.options.length >= 2;
-    const data = usingCustom ? custom : await loadFromFile();
-    if (!Array.isArray(data.options) || data.options.length < 2) {
-      throw new Error("Need at least 2 options");
-    }
+    const hasOptions = (d) => d && Array.isArray(d.options) && d.options.length >= 2;
+
+    let data;
+    if (hasOptions(urlData)) data = urlData;
+    else if (hasOptions(custom)) data = custom;
+    else data = await loadFromFile();
+
+    if (!hasOptions(data)) throw new Error("Need at least 2 options");
     applyData(data);
   } catch (err) {
     console.error("Couldn't load options:", err);
@@ -203,6 +256,7 @@ async function init() {
 // Small API the in-page editor uses to read/apply/reset options.
 window.WheelApp = {
   applyData,
+  shareURL,
   currentData: () => ({ title: currentTitle, sizeByWeight, options: rawOptions }),
   async reloadFromFile() {
     const data = await loadFromFile();
@@ -212,7 +266,7 @@ window.WheelApp = {
 };
 
 const TAU = Math.PI * 2;
-const SPIN_DURATION = 4200; // ms
+const SPIN_DURATION = 9000; // ms
 const SPIN_TURNS = 5; // full rotations before landing
 
 /** Pick a winning slice index using weight as probability. */
@@ -255,6 +309,19 @@ function sliceUnderPointer(rotation) {
   return 0;
 }
 
+/**
+ * Kick the flapper in the wheel's direction of travel, then let it spring
+ * back — called each time a peg snaps past, so it stays synced with the ticks.
+ */
+function flickFlapper() {
+  flapper.style.transition = "none";
+  flapper.style.transform = "translateX(-50%) rotate(24deg)";
+  requestAnimationFrame(() => {
+    flapper.style.transition = "transform 0.2s cubic-bezier(.18,.9,.32,1.3)";
+    flapper.style.transform = "translateX(-50%) rotate(0deg)";
+  });
+}
+
 /** Wheel center in viewport coordinates (for the confetti burst). */
 function wheelCenter() {
   const r = canvas.getBoundingClientRect();
@@ -283,6 +350,7 @@ function spin() {
     if (idx !== lastTickIndex) {
       lastTickIndex = idx;
       Sound.tick();
+      flickFlapper();
     }
 
     if (t < 1) {
